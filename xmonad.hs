@@ -1,7 +1,7 @@
 import XMonad
 import XMonad.Config.Desktop
 import XMonad.Config.Gnome
-import XMonad.Config.Mate
+--import XMonad.Config.Mate
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
 import qualified DBus as D
@@ -91,32 +91,21 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     -- terminals
     [ ((modMask,                 xK_Return), spawn $ XMonad.terminal conf)
-    -- ((modMask,                 xK_Return), spawn $ XMonad.terminal conf)
-    , ((modMask .|. shiftMask,   xK_Return), spawn "kgx")
+    , ((modMask .|. shiftMask,   xK_Return), spawn "tilix")
 
     -- launcher
     , ((modMask .|. shiftMask,   xK_p), spawn "gmrun")
 
     -- file manager
     , ((modMask ,                 xK_Up    ), raiseMaybe (spawn "nautilus ~") (className =? "Org.gnome.Nautilus" <&&> title =? "Home"))
-    --, ((modMask,                 xK_Up    ), runOrRaise "nautilus ~" (className =? "Nautilus"))
-    --, ((modMask .|. shiftMask,   xK_Up    ), spawn "nautilus ~")
-    --, ((modMask,                 xK_Up    ), spawn "nautilus ~")
 
 
     -- shell/window prompts
     , ((modMask,                 xK_F2 ), runOrRaisePrompt mySP)
 
-    -- Volume keys
-    -- , ((0, 0x1008ff11), spawn "amixer -q set Master 5%-")
-    -- , ((0, 0x1008ff13), spawn "amixer -q set Master 5%+")
-    -- , ((0, 0x1008ff12), spawn "amixer -q set Master toggle")
 
     -- browser
     , ((modMask,               xK_f     ), raiseNextMaybe (spawn "firefox") (className =? "firefox"))
-        -- , ((modMask,               xK_f     ), raiseMaybe
-        -- "firefox" (className =? "Firefox"))
-     -- browser
     , ((modMask,               xK_c     ), raiseNextMaybe (spawn "google-chrome-stable") (className =? "Google-chrome"))
 
     -- print screen
@@ -140,7 +129,8 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     -- Move focus to the next/previous window
     , ((modMask,               xK_j     ), windows W.focusDown)
     , ((modMask,               xK_Tab   ), windows W.focusDown)
-    , ((mod1Mask,              xK_Tab   ), spawn "/home/arthavah/.config/rofi/launchers/random_window_switcher.sh" )
+    , ((mod1Mask,              xK_Tab   ), spawn "rofi -show combi" )
+--, ((mod1Mask,              xK_Tab   ), spawn "/home/arthavah/.config/rofi/launchers/random_window_switcher.sh" )
     -- , ((mod1Mask,              xK_Tab   ), windows W.focusDown)
     , ((modMask,               xK_k     ), windows W.focusUp)
     , ((modMask .|. shiftMask, xK_Tab   ), windows W.focusUp)
@@ -175,8 +165,8 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask .|. controlMask, xK_n   ), sendMessage Reset)
 
     --Grid Select
-    , ((mod1Mask , xK_g            ), goToSelected  $ gsconfig1 )
-    , ((modMask , xK_g            ), spawn "/home/arthavah/.config/rofi/launchers/random_launcher.sh" )
+    , ((modMask , xK_g            ), goToSelected  $ gsconfig1 )
+    , ((mod1Mask , xK_g            ), spawn "~/.config/rofi/scripts/random_launcher.sh" )
     --, ((mod1Mask , xK_g            ), spawn  "rofi -show combi" )
 
     -- toggle focused window fullscreen
@@ -212,7 +202,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
         broadcastMessage ReleaseResources >> restart "xmonad" True)
 
  -- Logout of  xmonad
-    , ((modMask .|. shiftMask , xK_q     ),sequence_ [io (exitWith ExitSuccess), spawn "mate-session-save --kill"])
+    , ((modMask .|. shiftMask , xK_q     ),sequence_ [io (exitWith ExitSuccess), spawn "gnome-session-quit"])
     ]
 
     ++
@@ -242,7 +232,9 @@ myMouseBindings (XConfig {XMonad.modMask = modMask}) = M.fromList $
 -- Tags/Workspaces
 -- clickable workspaces via dzen/xdotool
 myWorkspaces            :: [String]
-myWorkspaces            = (map dzenEscape) $ ["1","2","3","4","5","6","7","8","9"]
+-- myWorkspaces            = (map dzenEscape) $ ["1","2","3","4","5","6","7","8","9"]
+
+myWorkspaces            = ["1","2","3","4","5","6","7","8","9"]
 
 
 -- shell prompt theme
@@ -288,7 +280,7 @@ myManageHook = composeAll
     , className =? "Gimp"           --> doFloat
     , className =? "Pidgin"         --> doFloat
     , className =? "Empathy"         --> doFloat
---    , className =? "Gnome-terminal"         -->  doShift (myWorkspaces !! 8)
+   -- , className =? "kgx"         -->  doShift (myWorkspaces !! 8)
     , className =? "Gnome-calculator"         --> doFloat
     , title     =? "glxgears"       --> doFloat
     , title     =? "inferno"        --> doFloat
@@ -362,13 +354,13 @@ myStartupHook = do
 --        spawn "/usr/libexec/gnome-fallback-mount-helper"
 --        spawn "/usr/bin/gnome-sound-applet"
 --        spawn "/usr/bin/nm-applet"
---        spawn "/usr/bin/synapse"
+        spawn "/usr/bin/synapse"
 --        spawn "/usr/bin/start-pulseaudio-x11"
 --        spawn "/usr/bin/gsettings-data-convert"
 --        spawn "/usr/bin/xdg-user-dirs-gtk-update"
 --        spawn "/usr/bin/trayer-srg --edge top --align right --SetDockType true --SetPartialStrut true --expand true --width 230 --widthtype pixel  --transparent true --height 22"
         spawn "/usr/bin/compton"
-	spawn "gnome-panel -r"
+--	spawn "gnome-panel -r"
 --        spawn "/usr/bin/gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh"
 --        spawn "/usr/bin/xfce4-power-manager"
 --        spawn "/usr/bin/caffeine-indicator"
@@ -515,8 +507,8 @@ main :: IO ()
 main = do
     dbus <- D.connectSession
     getWellKnownName dbus
-    xmonad $   ewmhFullscreen . setEwmhWorkspaceSort mySort. ewmh   $ withUrgencyHook dzenUrgencyHook { args = [ "-bg", "orange", "-fg", "black"] }$ mateConfig {
-                 terminal           = "tilix"
+    xmonad $   ewmhFullscreen . setEwmhWorkspaceSort mySort. ewmh   $ withUrgencyHook dzenUrgencyHook { args = [ "-bg", "orange", "-fg", "black"] }$ gnomeConfig {
+                 terminal           = "kgx"
                            , borderWidth        = 1
                            , normalBorderColor  = "black"
                            , focusedBorderColor = "orange"
