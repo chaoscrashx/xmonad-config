@@ -54,6 +54,7 @@ import XMonad.Layout.Named         -- custom layout names
 import XMonad.Layout.DecorationAddons
 import XMonad.Layout.ButtonDecoration
 import XMonad.Layout.Decoration
+import XMonad.Layout.Dishes
 import XMonad.Layout.Maximize
 import XMonad.Layout.Minimize
 import XMonad.Layout.NoFrillsDecoration
@@ -72,9 +73,11 @@ import XMonad.Prompt.Shell
 import XMonad.Prompt.Window
 
 import XMonad.Util.Run
+import XMonad.Util.Paste
 import XMonad.Util.Font
 import XMonad.Util.Themes
 import XMonad.Util.Scratchpad
+import XMonad.Util.NamedScratchpad
 import XMonad.Util.WorkspaceCompare
 import XMonad.Util.EZConfig
 -- import Graphics.X11.ExtraTypes.XF86
@@ -102,6 +105,10 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     -- shell/window prompts
     , ((modMask,                 xK_F2 ), runOrRaisePrompt mySP)
+
+    , ((modMask,                 xK_x ), layoutPrompt mySP)
+    , ((0,                       xK_Insert), pasteSelection)
+
 
 
     -- browser
@@ -257,7 +264,7 @@ theFont = "xft:Noto Sans:pixelsize=20"
 
 -- layouts 
 --myLayout = tiled ||| Circle ||| simpleFloat' shrinkText myTab ||| ThreeColMid nmaster (delta) (ratio) ||| Grid |||  layoutHints (tabbed shrinkText myTab) |||  spiral (6/7)  ||| mosaic 2 [3,2]
-myLayout = named "Tall" tiled |||  named "Grid" grid1 |||  mouseResizableTile ||| named "Circle" circle1 |||  named "Float" float1 |||  named "Tabbed" tab1 |||  Accordion ||| named "Mosaic" mosaic1 ||| named "ThreeCol" threecol1 
+myLayout = named "Tall" tiled |||  named "Grid" grid1 ||| named "Tabbed" tab1 ||| named "Circle" circle1  |||  mouseResizableTile |||  named "Float" float1 |||   Accordion ||| named "Mosaic" mosaic1 ||| named "ThreeCol" threecol1 
     where
         tiled   = Mag.magnifierOff( ResizableTall nmaster delta ratio [])
         nmaster = 1
@@ -280,7 +287,7 @@ myManageHook = composeAll
     , className =? "Gimp"           --> doFloat
     , className =? "Pidgin"         --> doFloat
     , className =? "Empathy"         --> doFloat
-   -- , className =? "kgx"         -->  doShift (myWorkspaces !! 8)
+    , className =? "kgx"         -->  doShift (myWorkspaces !! 1)
     , className =? "Gnome-calculator"         --> doFloat
     , title     =? "glxgears"       --> doFloat
     , title     =? "inferno"        --> doFloat
