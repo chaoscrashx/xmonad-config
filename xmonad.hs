@@ -24,7 +24,6 @@ import XMonad.Hooks.DynamicLog
 --import XMonad.Hooks.EwmhDesktops (ewmh,fullscreenEventHook, ewmhDesktopsLogHookCustom)
 -- import XMonad.Hooks.EwmhDesktops 
 import XMonad.Hooks.EwmhDesktops
-import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.SetWMName
 import XMonad.Hooks.ManageDocks
@@ -63,6 +62,7 @@ import qualified XMonad.Layout.Magnifier as Mag
 import XMonad.Layout.DecorationMadness
 import XMonad.Actions.MouseResize
 import XMonad.Layout.WindowArranger
+import XMonad.Layout.PerWorkspace
 
 
 import XMonad.Prompt
@@ -80,12 +80,12 @@ import XMonad.Util.Scratchpad
 import XMonad.Util.NamedScratchpad
 import XMonad.Util.WorkspaceCompare
 import XMonad.Util.EZConfig
--- import Graphics.X11.ExtraTypes.XF86
+import XMonad.Actions.SpawnOn
+import XMonad.Util.NamedScratchpad (namedScratchpadFilterOutWorkspacePP,namedScratchpadManageHook, defaultFloating, namedScratchpadAction)
 
---import System.Taffybar.Support.PagerHints (pagerHints)
+
 
 import System.Environment
--- import System.Cmd
 import System.IO
 import System.Exit
 import Control.Concurrent
@@ -97,7 +97,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask .|. shiftMask,   xK_Return), spawn "tilix")
 
     -- launcher
-    , ((modMask .|. shiftMask,   xK_p), spawn "gmrun")
+    -- , ((modMask .|. shiftMask,   xK_p), spawn "gmrun")
 
     -- file manager
     , ((modMask ,                 xK_Up    ), raiseMaybe (spawn "nautilus ~") (className =? "Org.gnome.Nautilus" <&&> title =? "Home"))
@@ -106,14 +106,17 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     -- shell/window prompts
     , ((modMask,                 xK_F2 ), runOrRaisePrompt mySP)
 
-    , ((modMask,                 xK_x ), layoutPrompt mySP)
+   
     , ((0,                       xK_Insert), pasteSelection)
 
 
 
     -- browser
     , ((modMask,               xK_f     ), raiseNextMaybe (spawn "firefox") (className =? "firefox"))
+    , ((modMask,               xK_x     ), raiseNextMaybe (spawn "code") (className =? "Code"))
     , ((modMask,               xK_c     ), raiseNextMaybe (spawn "google-chrome-stable") (className =? "Google-chrome"))
+    --  , ((modMask,   xK_x ), namedScratchpadAction myScratchPads "notes")
+     , ((modMask,              xK_n ), namedScratchpadAction myScratchPads "notes")
 
     -- print screen
     , ((0,                     xK_Print ), unsafeSpawn "scrot -e 'mv $f ~/Pictures'")
@@ -161,7 +164,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask,               xK_period), sendMessage (IncMasterN (-1)))
 
     -- Resize viewed windows to the correct size
-    , ((modMask,               xK_n     ), refresh)
+    -- , ((modMask,               xK_n     ), refresh)
     -- Reset layout of current workspace
     , ((modMask .|. shiftMask, xK_n     ), setLayout $ XMonad.layoutHook conf)
 
@@ -243,6 +246,26 @@ myWorkspaces            :: [String]
 
 myWorkspaces            = ["1","2","3","4","5","6","7","8","9"]
 
+myTerminal :: String
+myTerminal = "kgx "
+
+myScratchPads :: [NamedScratchpad]
+myScratchPads = [
+    NS "terminal" spawnTerm findTerm manageTerm
+    , NS "calculator" spawnCalc findCalc manageCalc
+    ,NS "notes" spawnNotes findNotes manageNotes
+    ]
+    where
+    spawnTerm  = myTerminal ++ " -T scratchpad"
+    findTerm   = title =? "scratchpad"
+    manageTerm = defaultFloating 
+    spawnCalc  = "gnome-calculator"
+    findCalc   = title =? "Calculator"
+    manageCalc = defaultFloating
+    spawnNotes  = ".joplin/Joplin.AppImage"
+    findNotes   = className =? "Joplin"
+    manageNotes = defaultFloating
+
 
 -- shell prompt theme
 mySP = def
@@ -254,27 +277,21 @@ mySP = def
     , promptBorderWidth = 1
     , position          = Bottom
     , height            = 20
-    --, autoComplete      = Just 1000
+    , autoComplete      = Just 1000
     , historySize       = 1000 }
 
 theFont :: String
 theFont = "xft:Noto Sans:pixelsize=20"
--- simpleFloat def {fontName = theFont} |||
 
 
 -- layouts 
---myLayout = tiled ||| Circle ||| simpleFloat' shrinkText myTab ||| ThreeColMid nmaster (delta) (ratio) ||| Grid |||  layoutHints (tabbed shrinkText myTab) |||  spiral (6/7)  ||| mosaic 2 [3,2]
-myLayout = named "Tall" tiled |||  named "Grid" grid1 ||| named "Tabbed" tab1 ||| named "Circle" circle1  |||  mouseResizableTile |||  named "Float" float1 |||   Accordion ||| named "Mosaic" mosaic1 ||| named "ThreeCol" threecol1 
+myLayout = onWorkspaces ["1"]  circle1 (named "Tall" tiled)  ||| named "Tall" tiled |||  named "Grid" grid1 ||| named "Tabbed" tab1 ||| named "Circle" circle1  |||  mouseResizableTile |||  named "Float" float1  |||   Accordion ||| named "Mosaic" mosaic1 ||| named "ThreeCol" threecol1 
     where
         tiled   = Mag.magnifierOff( ResizableTall nmaster delta ratio [])
         nmaster = 1
         delta   = 3/100
         ratio   = 1/2
-        -- float1 = maximize $ buttonDeco shrinkText myTab  (simplestFloat)
-        -- float2 = floatDwmStyle shrinkText myTab 
-        -- float1 =   borderResize (buttonDeco shrinkText tabThemeWithButtons (floatDwmStyle shrinkText tabThemeWithButtons))
         float1 =   borderResize $ mouseResize $ (buttonDeco shrinkText tabThemeWithButtons (simplestFloat))
-        -- float2 = minimize $ maximize $ buttonDeco shrinkText myTab (simplestFloat)  (theme adwaitaDarkTheme)
         tab1 = layoutHints (tabbed shrinkText myTab)
         grid1 =  Mag.magnifier Grid
         mosaic1 = Mag.magnifier (mosaic 2 [3,2])
@@ -287,24 +304,39 @@ myManageHook = composeAll
     , className =? "Gimp"           --> doFloat
     , className =? "Pidgin"         --> doFloat
     , className =? "Empathy"         --> doFloat
-    , className =? "kgx"         -->  doShift (myWorkspaces !! 1)
-    , className =? "Gnome-calculator"         --> doFloat
+    , className =? "kgx"         -->  doShift (myWorkspaces !! 0)
+    , className =? "Tilix"         -->  doShift (myWorkspaces !! 0)
+    , className =? "firefox"     --> doShift (myWorkspaces !! 1)
+    , className =? "Code"     --> doShift (myWorkspaces !! 2)
+    , className =? "Codux"     --> doShift (myWorkspaces !! 2)
+    , className =? "Chromium"     --> doShift (myWorkspaces !! 3)
+    , className =? "Google-chrome"     --> doShift (myWorkspaces !! 3)
+    , className =? "smplayer"     --> doShift (myWorkspaces !! 5)
     , title     =? "glxgears"       --> doFloat
     , title     =? "inferno"        --> doFloat
     , title     =? "Contact List"   --> doFloat
     , title     =? "Downloads"   --> doFloat
-    , title     =? "Save As..."   --> doFloat
+    , title     =? "Save As"   --> doFloat
     , title 	=? "Panel Properties" --> doFloat
     , className =? "Empathy"        --> doFloat
     , className =? "Gnome-panel"    --> doIgnore
     , className =? "XVkbd"          --> doIgnore
     , className =? "Cellwriter"     --> doIgnore
+    , className =? "confirm"        --> doFloat
     , className =? "Gtkdialog"      --> doFloat
+    , className =? "file_progress"             --> doFloat
+    , className =? "dialog"                    --> doFloat
+    , className =? "download"                  --> doFloat
+    , className =? "error"                     --> doFloat
+    , className =? "notification"              --> doFloat
+    , className =? "toolbar"                   --> doFloat
+    , title     =? "Change Foreground Color"   --> doCenterFloat
+    , title     =? "Change Background Color"   --> doCenterFloat
+    , title     =? "Change color of selected text" --> doCenterFloat
     , resource  =? "desktop_window" --> doIgnore
     , isFullscreen             --> doFullFloat
     --                                      x y w h
-    , scratchpadManageHook $ W.RationalRect 0 0 1 0.42
-    , manageDocks ] <+> manageHook def
+    , manageDocks ] <+> manageHook def <+> namedScratchpadManageHook myScratchPads
 
 -- Grid Select Section
 --gsconfig2 colorizer = (buildDefaultGSConfig colorizer) { gs_cellheight = 60 ,gs_cellwidth = 300, gs_font = "xft:Noto Sans:pixelsize=18",gs_cellpadding = 5 }
@@ -351,32 +383,11 @@ myDeco = def
     , decoHeight          = 10 }
 
 
--- myEventHook e = do
---         screenCornerEventHook e
-
-
 myStartupHook = do
---        spawn "/usr/libexec/gsd-xsettings"
---        spawn "/usr/libexec/gsd-media-keys"
---        spawn "/usr/libexec/gnome-fallback-mount-helper"
---        spawn "/usr/bin/gnome-sound-applet"
---        spawn "/usr/bin/nm-applet"
-        spawn "/usr/bin/synapse"
---        spawn "/usr/bin/start-pulseaudio-x11"
---        spawn "/usr/bin/gsettings-data-convert"
---        spawn "/usr/bin/xdg-user-dirs-gtk-update"
---        spawn "/usr/bin/trayer-srg --edge top --align right --SetDockType true --SetPartialStrut true --expand true --width 230 --widthtype pixel  --transparent true --height 22"
-        spawn "/usr/bin/compton"
---	spawn "gnome-panel -r"
---        spawn "/usr/bin/gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh"
---        spawn "/usr/bin/xfce4-power-manager"
---        spawn "/usr/bin/caffeine-indicator"
---        spawn "/usr/lib/x86_64-linux-gnu/polkit-mate/polkit-mate-authentication-agent-1"
---        spawn "/usr/bin/kdeconnect-indicator"
---        spawn "/usr/bin/dunst"
---        spawn "/usr/bin/synclient TapButton3=2"
-        spawn "xsetroot -cursor_name left_ptr"
---        spawn "/home/max/scriptz/random_wallpaper.sh"
+    -- return () >> checkKeymap myKeys
+    spawn "/usr/bin/compton"
+    spawn "xsetroot -cursor_name left_ptr"
+
 
 minimizeButtonOffset :: Int
 minimizeButtonOffset = 48
@@ -415,12 +426,6 @@ myTab = def
     , decoWidth           = 24
     , urgentTextColor     = "yellow" }
 
--- myLogHook h = ewmhDesktopsLogHookCustom scratchpadFilterOutWorkspace >> updatePointer (0.5, 0.5) (1, 1)
---myLogHook h = dynamicLogWithPP $ myDzenPP { ppOutput = hPutStrLn h }
-
-
-
-
 
 --dbus stuff for mate panel integration with xmonad-log-applet
 
@@ -440,28 +445,6 @@ prettyPrinter dbus = def
     , ppLayout  = pangoColor "cyan".wrap "| " " |" . pangoSanitize
     , ppSep      = "   "
     }
-
-
-
-
-myDzenPP  = dzenPP
-    { ppCurrent = dzenColor "#00d5ff" "" . wrap " " " "
-    , ppHidden  = dzenColor "#C7F09F" "" . wrap " " " "
-    , ppHiddenNoWindows = dzenColor "#ff5500" "" . wrap " " " "
-    , ppUrgent  = dzenColor "#ff0000" "" . pad . dzenStrip
-    , ppSep     = "     "
-    , ppVisible = wrap "[" "]"
-    , ppSort = getSortByXineramaRule
-    , ppLayout  = dzenColor "#4811a4" "#ff5500" . wrap "^ca(1,xdotool key super+space)· " " ·^ca()"
-    , ppTitle   = dzenColor "#ff5500" "#222222"
-                    . wrap "^ca(1,xdotool key super+k)^ca(2,xdotool key super+shift+c)"
-                           "                          ^ca()^ca()" . dzenEscape
-    }
-
-
-
-
-
 
 getWellKnownName :: D.Client -> IO ()
 getWellKnownName dbus = do
@@ -493,22 +476,7 @@ pangoSanitize = foldr sanitize ""
 
 
 
--- "-*-noto sans-medium-r-normal-*-12-120-*-*-p-*-iso8859-*"
-
-
-myDzenStatus = "dzen2 -w '930' -ta 'l'" ++ myDzenStyle
-myDzenConky  = "conky -c ~/.xmonad/conkyrc | dzen2 -x '930' -w '760' -ta 'r'" ++ myDzenStyle
--- myDzenStyle  = " -h '22' -fg '#777777' -bg '#222222' -fn '-monotype-noto sans mono medium-medium-r-normal--13-120-0-0-m-0-iso8859-1'"
-myDzenStyle  = " -h '22' -fg '#777777' -bg '#222222' -fn '-monotype-noto sans-medium-*-normal-*-100-100-*-*-iso8859-*'"
---myStartMenu = "/home/roh/.xmonad/start /home/roh/.xmonad/start_apps"
-
-
 mySort = getSortByXineramaRule
-
-
-----status <- spawnPipe myDzenStatus    -- xmonad status on the left
-        --conky  <- spawnPipe myDzenConky     -- conky stats on the right
---    dzenStartMenu    <- spawnPipe myStartMenu
 
 main :: IO ()
 main = do
@@ -516,21 +484,20 @@ main = do
     getWellKnownName dbus
     xmonad $   ewmhFullscreen . setEwmhWorkspaceSort mySort. ewmh   $ withUrgencyHook dzenUrgencyHook { args = [ "-bg", "orange", "-fg", "black"] }$ gnomeConfig {
                  terminal           = "kgx"
-                           , borderWidth        = 1
-                           , normalBorderColor  = "black"
-                           , focusedBorderColor = "orange"
-                           , focusFollowsMouse  = True
-                           , modMask            = mod4Mask
-                           , keys               = myKeys
-               , mouseBindings      = myMouseBindings
-               , workspaces = myWorkspaces
-               , startupHook    =  myStartupHook >>  setWMName "LG3D"
-                           , layoutHook         =  smartBorders $ avoidStruts $ desktopLayoutModifiers $ toggleLayouts (noBorders Full)  myLayout
-                           , manageHook         =  manageDocks <+> myManageHook <+> manageHook desktopConfig
-                           , handleEventHook    =  handleEventHook desktopConfig
-                           , logHook         =  do
-                               dynamicLogWithPP (prettyPrinter dbus)
-                               updatePointer (0.5, 0.5) (1, 1)
-                               logHook desktopConfig                              
-
+                 , borderWidth        = 1
+                 , normalBorderColor  = "black"
+                 , focusedBorderColor = "orange"
+                 , focusFollowsMouse  = True
+                 , modMask            = mod4Mask
+                 , keys               = myKeys
+                 , mouseBindings      = myMouseBindings
+                 , workspaces = myWorkspaces
+                 , startupHook    =  myStartupHook >>  setWMName "LG3D"
+                 , layoutHook         =  smartBorders $ avoidStruts $ desktopLayoutModifiers $ toggleLayouts (noBorders Full)  myLayout
+                 , manageHook         =  manageSpawn  <+> manageHook desktopConfig <+> myManageHook
+                 , handleEventHook    =  handleEventHook desktopConfig
+                 , logHook         =  do
+                    dynamicLogWithPP (prettyPrinter dbus)
+                    updatePointer (0.5, 0.5) (1, 1)
+                    logHook desktopConfig
                }
