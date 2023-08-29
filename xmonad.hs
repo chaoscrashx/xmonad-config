@@ -285,7 +285,7 @@ theFont = "xft:Noto Sans:pixelsize=20"
 
 
 -- layouts 
-myLayout = onWorkspaces ["1"]  circle1 (named "Tall" tiled)  ||| named "Tall" tiled |||  named "Grid" grid1 ||| named "Tabbed" tab1 ||| named "Circle" circle1  |||  mouseResizableTile |||  named "Float" float1  |||   Accordion ||| named "Mosaic" mosaic1 ||| named "ThreeCol" threecol1 
+myLayout = onWorkspaces ["9"]  circle1 (named "Tall" tiled)  ||| named "Tall" tiled |||  named "Grid" grid1 ||| named "Tabbed" tab1 ||| named "Circle" circle1  |||  mouseResizableTile |||  named "Float" float1  |||   Accordion ||| named "Mosaic" mosaic1 ||| named "ThreeCol" threecol1 
     where
         tiled   = Mag.magnifierOff( ResizableTall nmaster delta ratio [])
         nmaster = 1
@@ -304,14 +304,14 @@ myManageHook = composeAll
     , className =? "Gimp"           --> doFloat
     , className =? "Pidgin"         --> doFloat
     , className =? "Empathy"         --> doFloat
-    , className =? "kgx"         -->  doShift (myWorkspaces !! 0)
-    , className =? "Tilix"         -->  doShift (myWorkspaces !! 0)
+    , className =? "kgx"         -->  doShift (myWorkspaces !! 8)
+    , className =? "Tilix"         -->  doShift (myWorkspaces !! 8)
     , className =? "firefox"     --> doShift (myWorkspaces !! 1)
-    , className =? "Code"     --> doShift (myWorkspaces !! 2)
-    , className =? "Codux"     --> doShift (myWorkspaces !! 2)
-    , className =? "Chromium"     --> doShift (myWorkspaces !! 3)
-    , className =? "Google-chrome"     --> doShift (myWorkspaces !! 3)
-    , className =? "smplayer"     --> doShift (myWorkspaces !! 5)
+    , className =? "Code"     --> doShift (myWorkspaces !! 0)
+    , className =? "Codux"     --> doShift (myWorkspaces !! 0)
+    , className =? "Chromium"     --> doShift (myWorkspaces !! 2)
+    , className =? "Google-chrome"     --> doShift (myWorkspaces !! 2)
+    -- , className =? "smplayer"     --> doShift (myWorkspaces !! 5)
     , title     =? "glxgears"       --> doFloat
     , title     =? "inferno"        --> doFloat
     , title     =? "Contact List"   --> doFloat
