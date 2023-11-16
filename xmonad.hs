@@ -20,7 +20,9 @@ import XMonad.Actions.EasyMotion (selectWindow, EasyMotionConfig(..) )
 import qualified XMonad.Actions.Submap as SM
 
 
-import XMonad.Hooks.DynamicLog
+-- import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.StatusBar
+import XMonad.Hooks.StatusBar.PP
 --import XMonad.Hooks.EwmhDesktops (ewmh,fullscreenEventHook, ewmhDesktopsLogHookCustom)
 -- import XMonad.Hooks.EwmhDesktops 
 import XMonad.Hooks.EwmhDesktops
@@ -72,6 +74,7 @@ import XMonad.Prompt.RunOrRaise
 import XMonad.Prompt.Shell
 import XMonad.Prompt.Window
 
+import XMonad.Util.Loggers
 import XMonad.Util.Run
 import XMonad.Util.Paste
 import XMonad.Util.Font
@@ -438,7 +441,8 @@ myTab = def
 prettyPrinter :: D.Client -> PP
 prettyPrinter dbus = def
     { ppOutput   = dbusOutput dbus
-    , ppTitle    = pangoColor "cyan" . pangoSanitize
+    -- , ppTitle    = pangoColor "orange" 
+    , ppTitleSanitize = pangoColor "orange"
     , ppCurrent  = pangoColor "cyan" . wrap "[" "]" . pangoSanitize
     , ppVisible  = pangoColor "orange" . wrap "(" ")" . pangoSanitize
     , ppHiddenNoWindows   = pangoColor "white"
@@ -447,6 +451,7 @@ prettyPrinter dbus = def
     , ppUrgent   = pangoColor "red"
     , ppLayout  = pangoColor "cyan".wrap "| " " |" . pangoSanitize
     , ppSep      = "   "
+    , ppExtras = [ ] 
     }
 
 getWellKnownName :: D.Client -> IO ()
@@ -502,5 +507,5 @@ main = do
                  , logHook         =  do
                     dynamicLogWithPP (prettyPrinter dbus)
                     updatePointer (0.5, 0.5) (1, 1)
-                    logHook desktopConfig
+                    logHook gnomeConfig
                }
