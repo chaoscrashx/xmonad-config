@@ -1,8 +1,8 @@
 $ ghc --make xmonad.hs -i -ilib -fforce-recomp -main-is main -v0 -outputdir /home/crash/.xmonad/build-x86_64-linux -o /home/crash/.xmonad/xmonad-x86_64-linux
 
-xmonad.hs:320:13: warning: [-Wtabs]
+xmonad.hs:321:13: warning: [-Wtabs]
     Tab character found here.
     Please use spaces instead.
     |
-320 |     , title     =? "Panel Properties" --> doFloat
+321 |     , title     =? "Panel Properties" --> doFloat
     |             ^^^^

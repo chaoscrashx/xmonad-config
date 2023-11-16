@@ -94,7 +94,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     -- terminals
     [ ((modMask,                 xK_Return), spawn $ XMonad.terminal conf)
-    , ((modMask .|. shiftMask,   xK_Return), spawn "tilix")
+    , ((modMask .|. shiftMask,   xK_Return), spawn "kgx")
 
     -- launcher
     -- , ((modMask .|. shiftMask,   xK_p), spawn "gmrun")
@@ -113,8 +113,9 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     -- browser
     , ((modMask,               xK_f     ), raiseNextMaybe (spawn "firefox") (className =? "firefox"))
-    , ((modMask,               xK_x     ), raiseNextMaybe (spawn "code") (className =? "Code"))
-    , ((modMask,               xK_c     ), raiseNextMaybe (spawn "google-chrome-stable") (className =? "Google-chrome"))
+    , ((modMask,               xK_c     ), raiseNextMaybe (spawn "code") (className =? "Code"))
+    -- , ((modMask,               xK_c     ), raiseNextMaybe (spawn "google-chrome-stable") (className =? "Google-chrome"))
+    , ((modMask,               xK_x     ), raiseNextMaybe (spawn "microsoft-edge-stable") (className =? "Microsoft-edge"))
     --  , ((modMask,   xK_x ), namedScratchpadAction myScratchPads "notes")
      , ((modMask,              xK_n ), namedScratchpadAction myScratchPads "notes")
 
@@ -144,7 +145,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     -- , ((mod1Mask,              xK_Tab   ), windows W.focusDown)
     , ((modMask,               xK_k     ), windows W.focusUp)
     , ((modMask .|. shiftMask, xK_Tab   ), windows W.focusUp)
-    , ((mod1Mask .|. shiftMask, xK_Tab  ), windows W.focusUp)
+    -- , ((mod1Mask .|. shiftMask, xK_Tab  ), windows W.focusUp)
 
     -- Swap the focused window with next/prev window
     , ((modMask .|. shiftMask, xK_j     ), windows W.swapDown)
@@ -193,8 +194,8 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
 -- Easy Motion 
 
-    , ((modMask, xK_s), selectWindow def{txtCol="Green", cancelKey=xK_Escape} >>= (`whenJust` windows . W.focusWindow))
-    , ((modMask .|. shiftMask, xK_s), selectWindow def{txtCol="Red",cancelKey=xK_Escape} >>= (`whenJust` killWindow))
+    , ((modMask .|. controlMask,  xK_s), selectWindow def{txtCol="Green", cancelKey=xK_Escape} >>= (`whenJust` windows . W.focusWindow))
+    , ((modMask .|. shiftMask,  xK_s), selectWindow def{txtCol="Red",cancelKey=xK_Escape} >>= (`whenJust` killWindow))
 
 
     -- , ((modMask, xK_s), selectWindow def{txtCol="Green", cancelKey=xK_Escape, emFont="xft:Noto Sans Regular:pixelsize=80"} >>= (`whenJust` windows . W.focusWindow))
@@ -262,7 +263,7 @@ myScratchPads = [
     spawnCalc  = "gnome-calculator"
     findCalc   = title =? "Calculator"
     manageCalc = defaultFloating
-    spawnNotes  = ".joplin/Joplin.AppImage"
+    spawnNotes  = "APPIMAGELAUNCHER_DISABLE=1 .joplin/Joplin.AppImage"
     findNotes   = className =? "Joplin"
     manageNotes = defaultFloating
 
@@ -285,7 +286,7 @@ theFont = "xft:Noto Sans:pixelsize=20"
 
 
 -- layouts 
-myLayout = onWorkspaces ["9"]  circle1 (named "Tall" tiled)  ||| named "Tall" tiled |||  named "Grid" grid1 ||| named "Tabbed" tab1 ||| named "Circle" circle1  |||  mouseResizableTile |||  named "Float" float1  |||   Accordion ||| named "Mosaic" mosaic1 ||| named "ThreeCol" threecol1 
+myLayout = onWorkspaces ["1"]  grid1 (named "Tall" tiled)  ||| named "Tall" tiled |||  named "Grid" grid1 ||| named "Tabbed" tab1 ||| named "Circle" circle1  |||  mouseResizableTile |||  named "Float" float1  |||   Accordion ||| named "Mosaic" mosaic1 ||| named "ThreeCol" threecol1 
     where
         tiled   = Mag.magnifierOff( ResizableTall nmaster delta ratio [])
         nmaster = 1
@@ -304,14 +305,14 @@ myManageHook = composeAll
     , className =? "Gimp"           --> doFloat
     , className =? "Pidgin"         --> doFloat
     , className =? "Empathy"         --> doFloat
-    , className =? "kgx"         -->  doShift (myWorkspaces !! 8)
-    , className =? "Tilix"         -->  doShift (myWorkspaces !! 8)
-    , className =? "firefox"     --> doShift (myWorkspaces !! 1)
-    , className =? "Code"     --> doShift (myWorkspaces !! 0)
-    , className =? "Codux"     --> doShift (myWorkspaces !! 0)
-    , className =? "Chromium"     --> doShift (myWorkspaces !! 2)
-    , className =? "Google-chrome"     --> doShift (myWorkspaces !! 2)
-    -- , className =? "smplayer"     --> doShift (myWorkspaces !! 5)
+    , className =? "Tilix"         -->  doShift (myWorkspaces !! 0)
+    , className =? "Gnome-terminal"         -->  doShiftAndGo (myWorkspaces !! 0)
+    , className =? "firefox"     --> doShift (myWorkspaces !! 2)
+    , className =? "microsoft-edge"     --> doShift (myWorkspaces !! 2)
+    , className =? "Code"     --> doShift (myWorkspaces !! 1)
+    , className =? "Codux"     --> doShift (myWorkspaces !! 1)
+    , className =? "Chromium"     --> doShift (myWorkspaces !! 3)
+    , className =? "Google-chrome"     --> doShift (myWorkspaces !! 3)
     , title     =? "glxgears"       --> doFloat
     , title     =? "inferno"        --> doFloat
     , title     =? "Contact List"   --> doFloat
@@ -337,6 +338,8 @@ myManageHook = composeAll
     , isFullscreen             --> doFullFloat
     --                                      x y w h
     , manageDocks ] <+> manageHook def <+> namedScratchpadManageHook myScratchPads
+    where
+        doShiftAndGo ws = doF (W.greedyView ws) <+> doShift ws
 
 -- Grid Select Section
 --gsconfig2 colorizer = (buildDefaultGSConfig colorizer) { gs_cellheight = 60 ,gs_cellwidth = 300, gs_font = "xft:Noto Sans:pixelsize=18",gs_cellpadding = 5 }
@@ -483,7 +486,7 @@ main = do
     dbus <- D.connectSession
     getWellKnownName dbus
     xmonad $   ewmhFullscreen . setEwmhWorkspaceSort mySort. ewmh   $ withUrgencyHook dzenUrgencyHook { args = [ "-bg", "orange", "-fg", "black"] }$ gnomeConfig {
-                 terminal           = "kgx"
+                 terminal           = "gnome-terminal"
                  , borderWidth        = 1
                  , normalBorderColor  = "black"
                  , focusedBorderColor = "orange"
