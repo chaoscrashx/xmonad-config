@@ -143,7 +143,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     -- Move focus to the next/previous window
     , ((modMask,               xK_j     ), windows W.focusDown)
     , ((modMask,               xK_Tab   ), windows W.focusDown)
-    , ((mod1Mask,              xK_Tab   ), spawn "rofi -show combi" )
+    , ((mod1Mask,              xK_Tab   ), spawn "~/.xmonad/window_switcher.sh" )
 --, ((mod1Mask,              xK_Tab   ), spawn "/home/arthavah/.config/rofi/launchers/random_window_switcher.sh" )
     -- , ((mod1Mask,              xK_Tab   ), windows W.focusDown)
     , ((modMask,               xK_k     ), windows W.focusUp)
@@ -180,7 +180,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     --Grid Select
     , ((modMask , xK_g            ), goToSelected  $ gsconfig1 )
-    , ((mod1Mask , xK_g            ), spawn "~/.config/rofi/scripts/random_launcher.sh" )
+    , ((mod1Mask , xK_g            ), spawn "~/.xmonad/rofi_random_launcher.sh" )
     --, ((mod1Mask , xK_g            ), spawn  "rofi -show combi" )
 
     -- toggle focused window fullscreen
@@ -308,12 +308,12 @@ myManageHook = composeAll
     , className =? "Gimp"           --> doFloat
     , className =? "Pidgin"         --> doFloat
     , className =? "Empathy"         --> doFloat
-    , className =? "Tilix"         -->  doShift (myWorkspaces !! 0)
+    , className =? "Tilix"         -->  doShiftAndGo (myWorkspaces !! 0)
     , className =? "Gnome-terminal"         -->  doShiftAndGo (myWorkspaces !! 0)
-    , className =? "firefox"     --> doShift (myWorkspaces !! 2)
-    , className =? "microsoft-edge"     --> doShift (myWorkspaces !! 2)
-    , className =? "Code"     --> doShift (myWorkspaces !! 1)
-    , className =? "Codux"     --> doShift (myWorkspaces !! 1)
+    , className =? "firefox"     --> doShift (myWorkspaces !! 1)
+    , className =? "microsoft-edge"     --> doShift (myWorkspaces !! 1)
+    , className =? "Code"     --> doShift (myWorkspaces !! 2)
+    , className =? "Codux"     --> doShift (myWorkspaces !! 2)
     , className =? "Chromium"     --> doShift (myWorkspaces !! 3)
     , className =? "Google-chrome"     --> doShift (myWorkspaces !! 3)
     , title     =? "glxgears"       --> doFloat
@@ -391,8 +391,11 @@ myDeco = def
 
 myStartupHook = do
     -- return () >> checkKeymap myKeys
-    spawn "/usr/bin/compton"
-    spawn "xsetroot -cursor_name left_ptr"
+    spawn "/usr/bin/picom"
+    spawn "/usr/bin/nm-applet"
+    spawn "/usr/bin/synapse"
+    spawn "/usr/bin/variety"
+    --spawn "xsetroot -cursor_name left_ptr"
 
 
 minimizeButtonOffset :: Int
