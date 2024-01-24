@@ -445,7 +445,7 @@ prettyPrinter :: D.Client -> PP
 prettyPrinter dbus = def
     { ppOutput   = dbusOutput dbus 
     -- , ppTitle    = pangoColor "orange" 
-    , ppTitle = pangoColor "orange"  . shorten 88 . pangoSanitize
+    , ppTitle = pangoColor "orange"  . shorten 108 . pangoSanitize
     , ppTitleSanitize =  dzenStrip . xmobarStrip . dzenEscape 
     , ppCurrent  = pangoColor "cyan" . wrap "[" "]" . pangoSanitize
     , ppVisible  = pangoColor "orange" . wrap "(" ")" . pangoSanitize
