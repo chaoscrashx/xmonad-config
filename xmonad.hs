@@ -115,10 +115,10 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
 
     -- browser
-    , ((modMask,               xK_f     ), raiseNextMaybe (spawn "firefox") (className =? "firefox"))
-    , ((modMask,               xK_c     ), raiseNextMaybe (spawn "code") (className =? "Code"))
+    , ((modMask,               xK_f     ), raiseNextMaybe (spawn "firefox-devedition") (className =? "firefox-aurora"))
+    , ((modMask,               xK_x     ), raiseNextMaybe (spawn "code") (className =? "Code"))
     -- , ((modMask,               xK_c     ), raiseNextMaybe (spawn "google-chrome-stable") (className =? "Google-chrome"))
-    , ((modMask,               xK_x     ), raiseNextMaybe (spawn "microsoft-edge-stable") (className =? "Microsoft-edge"))
+    -- , ((modMask,               xK_x     ), raiseNextMaybe (spawn "microsoft-edge-stable") (className =? "Microsoft-edge"))
     --  , ((modMask,   xK_x ), namedScratchpadAction myScratchPads "notes")
      , ((modMask,              xK_n ), namedScratchpadAction myScratchPads "notes")
 
