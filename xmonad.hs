@@ -443,17 +443,18 @@ myTab = def
 
 prettyPrinter :: D.Client -> PP
 prettyPrinter dbus = def
-    { ppOutput   = dbusOutput dbus
+    { ppOutput   = dbusOutput dbus 
     -- , ppTitle    = pangoColor "orange" 
-    , ppTitleSanitize = pangoColor "orange"
+    , ppTitle = pangoColor "orange"  . shorten 88 . pangoSanitize
+    , ppTitleSanitize =  dzenStrip . xmobarStrip . dzenEscape 
     , ppCurrent  = pangoColor "cyan" . wrap "[" "]" . pangoSanitize
     , ppVisible  = pangoColor "orange" . wrap "(" ")" . pangoSanitize
     , ppHiddenNoWindows   = pangoColor "white"
-    , ppHidden  = pangoColor "#78C209"
+    , ppHidden  = pangoColor "orange"
     , ppSort = getSortByXineramaRule
     , ppUrgent   = pangoColor "red"
     , ppLayout  = pangoColor "cyan".wrap "| " " |" . pangoSanitize
-    , ppSep      = "   "
+    , ppSep      = " "
     , ppExtras = [ ] 
     }
 
